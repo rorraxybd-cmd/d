@@ -118,14 +118,15 @@
       pointer-events: auto;
     }
 
-    /* Floating Code Panel Folder */
+    /* Floating Code Panel Folder with Fixed Scrolling Support */
     .popup-panel {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.92);
-      width: 440px;
+      width: 480px;
       max-width: 94vw;
+      max-height: 88vh;
       background: var(--panel-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
@@ -138,6 +139,7 @@
       opacity: 0;
       pointer-events: none;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow-y: auto;
     }
 
     .popup-backdrop.active .popup-panel {
@@ -152,6 +154,7 @@
       align-items: center;
       padding-bottom: 10px;
       border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
     }
 
     .panel-title {
@@ -184,6 +187,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     /* Dynamic HTML Box (Hidden by default) */
@@ -217,7 +221,7 @@
 
     textarea {
       width: 100%;
-      height: 130px;
+      height: 90px;
       background: #08080b;
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -229,7 +233,8 @@
       outline: none;
     }
     textarea:focus { border-color: var(--accent-gold); }
-    #htmlCode { color: #ff9e64; height: 250px; }
+    #htmlCode { color: #ff9e64; height: 220px; }
+    #jsonCode { color: #f1fa8c; }
     #jsCode { color: #64dfdf; }
 
     /* Action Buttons Row */
@@ -237,6 +242,7 @@
       display: flex;
       gap: 10px;
       width: 100%;
+      flex-shrink: 0;
     }
 
     .btn-generate {
@@ -286,6 +292,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .view-switcher {
@@ -340,9 +347,9 @@
 
     /* Mobile Adaptations */
     @media (max-width: 600px) {
-      .popup-panel { padding: 14px; gap: 10px; }
-      textarea { height: 100px; }
-      #htmlCode { height: 200px; }
+      .popup-panel { padding: 12px; gap: 8px; max-height: 90vh; }
+      textarea { height: 75px; }
+      #htmlCode { height: 180px; }
       .floating-toggle-btn { top: 10px; left: 10px; padding: 8px 14px; font-size: 0.8rem; }
     }
   </style>
@@ -362,7 +369,7 @@
   <!-- Black Floating Toggle Button with Golden Gear -->
   <button class="floating-toggle-btn" onclick="togglePopup(true)">
     <svg class="gear-icon" viewBox="0 0 24 24">
-      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/>
+      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/>
     </svg>
     <span style="color:#ffffff;">Code Editor</span>
   </button>
@@ -385,23 +392,33 @@
         <button class="close-btn" onclick="togglePopup(false)">✕</button>
       </div>
 
-      <!-- Mode 1: CSS & JS Boxes -->
+      <!-- Main Container: CSS, JSON & JS Boxes -->
       <div id="cssJsContainer">
         <!-- 1. CSS Box -->
-        <div class="section-box" style="margin-bottom: 10px;">
-          <div class="section-title">CSS STYLESHEET</div>
+        <div class="section-box" style="margin-bottom: 8px;">
+          <div class="section-title">1. CSS STYLESHEET</div>
           <div class="file-input-wrapper">
-            <label class="file-label" for="cssFileInput" id="cssFileLabel">Upload CSS / Any Code File</label>
+            <label class="file-label" for="cssFileInput" id="cssFileLabel">Upload CSS File</label>
             <input type="file" id="cssFileInput" accept="*" onchange="handleFileUpload(event, 'cssCode', 'cssFileLabel')">
           </div>
           <textarea id="cssCode" placeholder="Paste CSS code here..."></textarea>
         </div>
 
-        <!-- 2. JS Box -->
-        <div class="section-box">
-          <div class="section-title">JAVASCRIPT CODE</div>
+        <!-- 2. JSON Box -->
+        <div class="section-box" style="margin-bottom: 8px;">
+          <div class="section-title">2. JSON DATA</div>
           <div class="file-input-wrapper">
-            <label class="file-label" for="jsFileInput" id="jsFileLabel">Upload JS / Any Code File</label>
+            <label class="file-label" for="jsonFileInput" id="jsonFileLabel">Upload JSON File</label>
+            <input type="file" id="jsonFileInput" accept="*" onchange="handleFileUpload(event, 'jsonCode', 'jsonFileLabel')">
+          </div>
+          <textarea id="jsonCode" placeholder="Paste JSON data here..."></textarea>
+        </div>
+
+        <!-- 3. JS Box -->
+        <div class="section-box">
+          <div class="section-title">3. JAVASCRIPT CODE</div>
+          <div class="file-input-wrapper">
+            <label class="file-label" for="jsFileInput" id="jsFileLabel">Upload JS File</label>
             <input type="file" id="jsFileInput" accept="*" onchange="handleFileUpload(event, 'jsCode', 'jsFileLabel')">
           </div>
           <textarea id="jsCode" placeholder="Paste JS code here..."></textarea>
@@ -412,7 +429,7 @@
       <div class="section-box" id="htmlSectionBox">
         <div class="section-title">HTML MARKUP</div>
         <div class="file-input-wrapper">
-          <label class="file-label" for="htmlFileInput" id="htmlFileLabel">Upload HTML / Any Code File</label>
+          <label class="file-label" for="htmlFileInput" id="htmlFileLabel">Upload HTML File</label>
           <input type="file" id="htmlFileInput" accept="*" onchange="handleFileUpload(event, 'htmlCode', 'htmlFileLabel')">
         </div>
         <textarea id="htmlCode" placeholder="Paste complete HTML code here..."></textarea>
@@ -450,7 +467,7 @@
       }
     }
 
-    // Switch between (CSS + JS Mode) and (Single HTML Mode)
+    // Switch between (CSS + JSON + JS Mode) and (Single HTML Mode)
     function switchMode() {
       const cssJsBox = document.getElementById('cssJsContainer');
       const htmlBox = document.getElementById('htmlSectionBox');
@@ -458,14 +475,14 @@
       const title = document.getElementById('panelTitle');
 
       if (currentMode === 'cssjs') {
-        // Hide CSS + JS, Show ONLY HTML
+        // Hide CSS + JSON + JS, Show ONLY HTML
         cssJsBox.style.display = 'none';
         htmlBox.style.display = 'flex';
-        toggleBtn.innerText = 'CSS & JS CODE';
+        toggleBtn.innerText = 'CSS, JSON & JS CODE';
         title.innerText = 'HTML Editor Panel';
         currentMode = 'html';
       } else {
-        // Show CSS + JS, Hide HTML
+        // Show CSS + JSON + JS, Hide HTML
         cssJsBox.style.display = 'block';
         htmlBox.style.display = 'none';
         toggleBtn.innerText = 'HTML CODE';
@@ -481,10 +498,11 @@
       }
     });
 
-    // Generate HTML Page and Render Frame
+    // Generate Page and Render Frame
     function generatePage() {
       const html = document.getElementById('htmlCode').value;
       const css = document.getElementById('cssCode').value;
+      const json = document.getElementById('jsonCode').value;
       const js = document.getElementById('jsCode').value;
 
       const iframe = document.getElementById('previewFrame');
@@ -496,12 +514,22 @@
         // Render Pure HTML input
         fullSource = html;
       } else {
-        // Render CSS + JS mode with fallback container
+        // Render CSS + JSON + JS mode
         const bodyContent = html.trim() ? html : `
           <div id="statusAlert" style="display:none;"></div>
           <div id="app"></div>
           <div id="root"></div>
         `;
+
+        // JSON Safe Script Injection
+        const jsonScript = json.trim() ? `
+          try {
+            window.jsonData = ${json};
+          } catch(e) {
+            console.error("Invalid JSON format:", e);
+            window.jsonData = null;
+          }
+        ` : 'window.jsonData = null;';
 
         fullSource = `
           <!DOCTYPE html>
@@ -517,6 +545,7 @@
             ${bodyContent}
 
             <script>
+              ${jsonScript}
               try {
                 ${js}
               } catch (err) {
@@ -571,12 +600,17 @@
     function clearAll() {
       document.getElementById('htmlCode').value = '';
       document.getElementById('cssCode').value = '';
+      document.getElementById('jsonCode').value = '';
       document.getElementById('jsCode').value = '';
-      document.getElementById('htmlFileLabel').innerText = "Upload HTML / Any Code File";
-      document.getElementById('cssFileLabel').innerText = "Upload CSS / Any Code File";
-      document.getElementById('jsFileLabel').innerText = "Upload JS / Any Code File";
+
+      document.getElementById('htmlFileLabel').innerText = "Upload HTML File";
+      document.getElementById('cssFileLabel').innerText = "Upload CSS File";
+      document.getElementById('jsonFileLabel').innerText = "Upload JSON File";
+      document.getElementById('jsFileLabel').innerText = "Upload JS File";
+
       document.getElementById('htmlFileInput').value = '';
       document.getElementById('cssFileInput').value = '';
+      document.getElementById('jsonFileInput').value = '';
       document.getElementById('jsFileInput').value = '';
       
       const iframe = document.getElementById('previewFrame');
